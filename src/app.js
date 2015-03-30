@@ -6,6 +6,7 @@ import PointerProxy from './lib/PointerProxy';
 const svgwidth = 1120;
 const loupeZoom = 1.5;
 var loupe, loupeContent, image1, image2, image3;
+var hasChanged = true;
 
 function loadSVG() {
   fetch('./assets/source.svg')
@@ -37,7 +38,6 @@ function updateLoupeAttribute() {
   
   loupe.setAttribute('transform', `translate(${x}, ${y})`);
 
-  
   var contentX = x / (loupeZoom * -2);
   var contentY = y / (loupeZoom * -2);
   
@@ -67,10 +67,14 @@ function moveLoupe(x, y) {
 }
 
 function draw() {
-  updateLoupeAttribute();
-  updateAttributes();
-  
+  if (hasChanged) {
+    updateLoupeAttribute();
+    updateAttributes();
+    
+    hasChanged = false;  
+  }
   requestAnimationFrame(draw);
+  
 }
 
 
@@ -102,10 +106,6 @@ function setup(container) {
   image3.point = {x: 0, y: 0};
   loupe.point = {x: 0, y: 0};
 
-  image1.dragSpeed = 0.7;
-  image2.dragSpeed = 0.4;
-  image3.dragSpeed = 1;
-
   var last = [];
   for (var i = 0; i < 3; i++) {
     last.push({
@@ -114,22 +114,7 @@ function setup(container) {
     });
   }
 
-  var dragging = false;
   var offset = [0, 0];
-
-  function setActiveDrag(e) {
-    dragging = this;
-    var lastPos = {
-      x: dragging.point.x,
-      y: dragging.point.y
-    }
-    dragging.lastPoint = lastPos;
-    offset = last[0];
-  }
-
-  image1.addEventListener('pointerdown', setActiveDrag);
-  image2.addEventListener('pointerdown', setActiveDrag);
-  image3.addEventListener('pointerdown', setActiveDrag);
 
   container.addEventListener('pointermove', function (e) {
     last.pop();
@@ -137,21 +122,15 @@ function setup(container) {
 
     last.unshift(point);
 
-    if (dragging) {
-      let x = (point.x - offset.x) * dragging.dragSpeed + dragging.lastPoint.x;
-      let y = (point.y - offset.y) * dragging.dragSpeed + dragging.lastPoint.y;
-      dragging.setAttribute('transform', `translate(${x}, ${y})`);
-    } else {
-      moveImages(point.x, point.y);
-    }
+    moveImages(point.x, point.y);
+    
+    hasChanged = true;
+
   })
 
-  container.addEventListener('pointerup', function (e) {
-    dragging = false;
-  })
 
   moveImages(0, 0);
-   draw();
+  draw();
 }
 
 // getTitleData(function (msg) {
