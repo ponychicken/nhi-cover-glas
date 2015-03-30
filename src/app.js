@@ -22,36 +22,19 @@ var mapRange = function (from, to, s) {
   return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
 };
 
-function getPredominantDirection(array) {
-  var x = Math.abs(array[0].x - array[array.length - 1].x);
-  var y = Math.abs(array[0].y - array[array.length - 1].y);
-
-  return (x > y) ? 'x' : 'y';
-}
-
-function invertDir(dir) {
-  if (dir == 'x') return 'y';
-  if (dir == 'y') return 'x';
-}
-
-function moveImages(x, y, dir) {
-  moveMaskContent(image1, mapRange([0, 1120], [79, -310], x), mapRange([0, 758], [170, -320], y), dir);
-  moveMaskContent(image2, mapRange([0, 758], [108, 489], y), mapRange([0, 1120], [-100, 490], x), invertDir(dir));
-  moveMaskContent(image3, mapRange([0, 758], [ 290, 0], y), mapRange([0, 1120], [220, -100], x), invertDir(dir));
+function moveImages(x, y) {
+  moveMaskContent(image1, mapRange([0, 1120], [79, -310], x), mapRange([0, 758], [170, -320], y));
+  moveMaskContent(image2, mapRange([0, 758], [108, 489], y), mapRange([0, 1120], [-100, 490], x));
+  moveMaskContent(image3, mapRange([0, 758], [ 290, 0], y), mapRange([0, 1120], [220, -100], x));
 }
 
 function moveMaskContent(element, x, y, dir) {
   var point = element.point;
   
-  if (dir != 'y') {
-    point.x = x;
-  }
-
-  if (dir != 'x') {
-    point.y = y;
-  }
+  point.x = x;
+  point.y = y;
   
-  element.setAttribute('transform', `translate(${point.x}, ${point.y})`)
+  element.setAttribute('transform', `translate(${point.x}, ${point.y})`);
 }
 
 
@@ -114,14 +97,13 @@ function setup(container) {
     var point = getRelativePoint(e, container);
 
     last.unshift(point);
-    var dir = getPredominantDirection(last);
 
     if (dragging) {
       let x = (point.x - offset.x) * dragging.dragSpeed + dragging.lastPoint.x;
       let y = (point.y - offset.y) * dragging.dragSpeed + dragging.lastPoint.y;
       dragging.setAttribute('transform', `translate(${x}, ${y})`);
     } else {
-      moveImages(point.x, point.y, dir);
+      moveImages(point.x, point.y);
     }
   })
 

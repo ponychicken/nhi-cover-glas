@@ -55,6 +55,8 @@ gulp.task('all', ['copy', 'browserify', 'css']);
 // Watch
 gulp.task('watch', function () {
 	gulp.watch('./src/*.css', ['css']);
+	gulp.watch('src/assets/**/**', ['copy']);
+	gulp.watch('src/index.html', ['copy']);
 });
 
 // Default
