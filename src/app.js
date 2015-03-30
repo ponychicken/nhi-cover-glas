@@ -4,6 +4,8 @@ import 'points';
 import PointerProxy from './lib/PointerProxy';
 
 const svgwidth = 1120;
+const loupeZoom = 1.5;
+var loupe, loupeContent, image1, image2, image3;
 
 function loadSVG() {
   fetch('./assets/source.svg')
@@ -26,6 +28,8 @@ function moveImages(x, y) {
   moveMaskContent(image1, mapRange([0, 1120], [79, -310], x), mapRange([0, 758], [170, -320], y));
   moveMaskContent(image2, mapRange([0, 758], [108, 489], y), mapRange([0, 1120], [-100, 490], x));
   moveMaskContent(image3, mapRange([0, 758], [ 290, 0], y), mapRange([0, 1120], [220, -100], x));
+  
+  moveLoupe(x, y);
 }
 
 function moveMaskContent(element, x, y, dir) {
@@ -37,6 +41,13 @@ function moveMaskContent(element, x, y, dir) {
   element.setAttribute('transform', `translate(${point.x}, ${point.y})`);
 }
 
+function moveLoupe(x, y) {
+  var contentX = x / (loupeZoom * -2);
+  var contentY = y / (loupeZoom * -2);
+  
+  loupeContent.setAttribute('transform', `scale(1.5) translate(${contentX}, ${contentY})`);
+  loupe.setAttribute('transform', `translate(${x}, ${y})`);
+}
 
 function getRelativePoint(event, element) {
   var bounds = element.getBoundingClientRect();
@@ -55,13 +66,16 @@ function setup(container) {
   var images = svg.querySelectorAll('.cropped');
   console.log(images.length);
 
-  var image1 = images[1];
-  var image2 = images[2];
-  var image3 = images[0];
+  image1 = images[1];
+  image2 = images[2];
+  image3 = images[0];
+  loupe = svg.querySelector('#circle-loupe');
+  loupeContent = svg.querySelector('#loupe-visible use');
 
   image1.point = {x: 0, y: 0};
   image2.point = {x: 0, y: 0};
   image3.point = {x: 0, y: 0};
+  loupe.point = {x: 0, y: 0};
 
   image1.dragSpeed = 0.7;
   image2.dragSpeed = 0.4;
