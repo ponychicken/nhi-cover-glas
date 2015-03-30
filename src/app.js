@@ -32,22 +32,47 @@ function moveImages(x, y) {
   moveLoupe(x, y);
 }
 
-function moveMaskContent(element, x, y, dir) {
-  var point = element.point;
+function updateLoupeAttribute() {
+  var {x, y} = loupe.point;
   
-  point.x = x;
-  point.y = y;
-  
-  element.setAttribute('transform', `translate(${point.x}, ${point.y})`);
-}
+  loupe.setAttribute('transform', `translate(${x}, ${y})`);
 
-function moveLoupe(x, y) {
+  
   var contentX = x / (loupeZoom * -2);
   var contentY = y / (loupeZoom * -2);
   
   loupeContent.setAttribute('transform', `scale(1.5) translate(${contentX}, ${contentY})`);
-  loupe.setAttribute('transform', `translate(${x}, ${y})`);
 }
+
+function updateAttribute(element) {
+  element.setAttribute('transform', `translate(${element.point.x}, ${element.point.y})`);
+}
+
+function updateAttributes() {
+  updateAttribute(image1);
+  updateAttribute(image2);
+  updateAttribute(image3);
+  updateLoupeAttribute();
+}
+
+function moveMaskContent(element, x, y, dir) {
+  var point = element.point;
+  point.x = x;
+  point.y = y;
+}
+
+function moveLoupe(x, y) {
+  loupe.point.x = x;
+  loupe.point.y = y;
+}
+
+function draw() {
+  updateLoupeAttribute();
+  updateAttributes();
+  
+  requestAnimationFrame(draw);
+}
+
 
 function getRelativePoint(event, element) {
   var bounds = element.getBoundingClientRect();
@@ -126,6 +151,7 @@ function setup(container) {
   })
 
   moveImages(0, 0);
+   draw();
 }
 
 // getTitleData(function (msg) {
