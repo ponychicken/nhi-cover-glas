@@ -1,5 +1,5 @@
 import 'whatwg-fetch';
-//import getTitleData from './lib/getData';
+import {redirectParent, getTitleData} from './lib/getData';
 import 'points';
 import PointerProxy from './lib/PointerProxy';
 
@@ -23,13 +23,13 @@ function loadSVG() {
     });
 }
 
-var mapRange = function (from, to, s) {
+function mapRange(from, to, s) {
   return to[0] + (s - from[0]) * (to[1] - to[0]) / (from[1] - from[0]);
-};
+}
 
 function moveImages(x, y) {
   moveMaskContent(image1, mapRange([0, 1120], [79, -310], x), mapRange([0, 758], [170, -320], y));
-  moveMaskContent(image2, mapRange([0, 758], [108, 489], y), mapRange([0, 1120], [-100, 490], x));
+  moveMaskContent(image2, mapRange([0, 758], [204, 489], y), mapRange([0, 1120], [42, 495], x));
   moveMaskContent(image3, mapRange([0, 758], [ 290, 0], y), mapRange([0, 1120], [220, -100], x));
   
   moveLoupe(x, y);
@@ -83,15 +83,15 @@ function randomMove(xOld, yOld) {
   var x = Math.random() * 1120;
   var y = Math.random() * 760;
   
-  var duration = 2 + Math.random() * 4;
+  var distance = Math.sqrt(Math.pow(xOld - x, 2) + Math.pow(yOld - y, 2))
+  
+  var duration = distance / 100;
   var intervalFrequency = 5;
   var lastTime = duration * 1000;
   var steps = ~~(lastTime / intervalFrequency);
   var step = 0;
   // Call it a lot, since this doesn't actually do anything heavy
   var interval = setInterval(function () {
-
-    
     var xNow = xOld + (x - xOld) / steps * step;
     var yNow = yOld + (y - yOld) / steps * step;
     
@@ -142,7 +142,7 @@ function setup(container) {
   var first = true;
   loupe.style.display = 'none';
   
-  container.addEventListener('pointermove', function (e) {
+  svg.addEventListener('pointermove', function (e) {
     if (first) {
       loupe.style.display = '';
       first = false;
@@ -159,25 +159,24 @@ function setup(container) {
   moveImages(0, 0);
   draw();
   
-  if ('ontouchstart' in window) {
+  if (true || 'ontouchstart' in window) {
     loupe.style.display = '';
     randomMove(400, 300);
   }
+  
+  getTitleData(function (msg) {    
+    // Add link to body to have the parent redirect to the magazine URL
+    if (msg.isHomepage) {
+      document.body.addEventListener('click', function() {
+        redirectParent(msg.domain_path);
+      });
+      document.body.style.cursor = 'pointer';
+    }
+  });
 
 }
 
 
-// getTitleData(function (msg) {
-//   document.querySelector('h1').innerHTML = msg.title;
-//   document.querySelector('h2').innerHTML = msg.subtitle;
-//   
-//   // Add link to body to have the parent redirect to the magazine URL
-//   if (msg.isHomepage) {
-//     document.body.addEventListener('click', function() {
-//       redirectParent(msg.domain_path);
-//     });
-//     document.body.style.cursor = 'pointer';
-//   }
-// });
+
 
 loadSVG();
