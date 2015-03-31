@@ -134,7 +134,7 @@
     </clipPath>
     <g clip-path="url(#SVGID_4_)">
       <g class="cropped" id="image1">
-        <image overflow="visible" width="2722" height="3211" xlink:href="./assets/flint.jpg" transform="matrix(0.2228 0 0 0.2228 623.4969 -59.5002)">
+        <image overflow="visible" width="2722" height="3211" xlink:href="./assets/flint.jpg" transform="translate(623.4969, -59.5002) scale(0.23)">
           </image>
       </g>
     </g>
@@ -148,7 +148,7 @@
     </clipPath>
     <g clip-path="url(#SVGID_6_)">
       <g class="cropped" id="image2">
-        <image overflow="visible" width="600" height="800" xlink:href="./assets/sabine_marcelis.jpg" transform="matrix(1.3855 0 0 1.3855 42.0657 -200.4206)">
+        <image overflow="visible" width="1875" height="2500" xlink:href="./assets/glass1.jpg" transform="scale(0.27)">
           </image>
       </g>
     </g>
