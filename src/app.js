@@ -4,9 +4,11 @@ import 'points';
 import PointerProxy from './lib/PointerProxy';
 
 const svgwidth = 1120;
+const svgheight = 758;
 const loupeZoom = 1.5;
 var loupe, loupeContent, image1, image2, image3;
 var hasChanged = true;
+
 
 function loadSVG() {
   fetch('./assets/source.svg')
@@ -77,13 +79,42 @@ function draw() {
   
 }
 
+function randomMove(xOld, yOld) {
+  var x = Math.random() * 1120;
+  var y = Math.random() * 760;
+  
+  var duration = 2 + Math.random() * 4;
+  var intervalFrequency = 5;
+  var lastTime = duration * 1000;
+  var steps = ~~(lastTime / intervalFrequency);
+  var step = 0;
+  // Call it a lot, since this doesn't actually do anything heavy
+  var interval = setInterval(function () {
+
+    
+    var xNow = xOld + (x - xOld) / steps * step;
+    var yNow = yOld + (y - yOld) / steps * step;
+    
+    if (step > steps) {
+      clearInterval(interval);
+      randomMove(xNow, yNow);
+      return;
+    }
+    
+    moveImages(xNow, yNow);
+    hasChanged = true;
+    step++;
+  }, intervalFrequency);
+}
 
 function getRelativePoint(event, element) {
   var bounds = element.getBoundingClientRect();
   var x = event.clientX - bounds.left;
   var y = event.clientY - bounds.top;
-  x *= svgwidth / window.innerWidth;
-  y *= svgwidth / window.innerWidth;
+  var svgScale = Math.max(svgwidth / window.innerWidth, svgheight / window.innerHeight);
+  
+  x *= svgScale;
+  y *= svgScale;
   return {
     x: x,
     y: y
@@ -106,21 +137,17 @@ function setup(container) {
   image3.point = {x: 0, y: 0};
   loupe.point = {x: 0, y: 0};
 
-  var last = [];
-  for (var i = 0; i < 3; i++) {
-    last.push({
-      x: 0,
-      y: 0
-    });
-  }
 
   var offset = [0, 0];
-
+  var first = true;
+  loupe.style.display = 'none';
+  
   container.addEventListener('pointermove', function (e) {
-    last.pop();
-    var point = getRelativePoint(e, container);
-
-    last.unshift(point);
+    if (first) {
+      loupe.style.display = '';
+      first = false;
+    }
+    var point = getRelativePoint(e, svg);
 
     moveImages(point.x, point.y);
     
@@ -131,7 +158,14 @@ function setup(container) {
 
   moveImages(0, 0);
   draw();
+  
+  if ('ontouchstart' in window) {
+    loupe.style.display = '';
+    randomMove(400, 300);
+  }
+
 }
+
 
 // getTitleData(function (msg) {
 //   document.querySelector('h1').innerHTML = msg.title;
